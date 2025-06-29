@@ -10,7 +10,7 @@ export default defineConfig({
         { src: "public/manifest.json", dest: "." },
         { src: "public/icon.png", dest: "." },
         { src: "public/popup.html", dest: "." },
-        { src: "src/content/ContentScript.js", dest: "." },
+        { src: "src/content/contentScript.js", dest: "."},
         { src: "src/background.js", dest: "." }
       ]
     })
