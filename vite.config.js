@@ -1,25 +1,17 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { viteStaticCopy } from "vite-plugin-static-copy";
 
+// Note: `vite-plugin-static-copy` caused an esbuild resolution error in some
+// environments because its published package lacked built files. Instead of
+// relying on that plugin, static extension assets are placed in `public/`
+// where Vite will copy them to `dist/` automatically.
 export default defineConfig({
-  plugins: [
-    react(),
-    viteStaticCopy({
-      targets: [
-        { src: "public/manifest.json", dest: "." },
-        { src: "public/icon.png", dest: "." },
-        { src: "public/popup.html", dest: "." },
-        { src: "src/content/contentScript.js", dest: "."},
-        { src: "src/background.js", dest: "." }
-      ]
-    })
-  ],
+  plugins: [react()],
   build: {
     rollupOptions: {
-      input: "./public/popup.html", // 👈 Tell Vite this is the real HTML entry
+      input: "./public/popup.html",
     },
     outDir: "dist",
-    emptyOutDir: true
-  }
+    emptyOutDir: true,
+  },
 });

@@ -12,6 +12,8 @@ export default function Popup() {
   const [contextSource, setContextSource] = useState("selection");
   const [toast, setToast] = useState("");
   const [contextPreloaded, setContextPreloaded] = useState(false);
+  const [apiKey, setApiKey] = useState("");
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     chrome.storage.local.get(["retortContext"], (result) => {
@@ -20,6 +22,10 @@ export default function Popup() {
         setContextPreloaded(true);
         chrome.storage.local.remove(["retortContext"]);
       }
+    });
+    // Load stored API key (if any)
+    chrome.storage.local.get(["openrouterApiKey"], (res) => {
+      if (res.openrouterApiKey) setApiKey(res.openrouterApiKey);
     });
   }, []);
 
@@ -37,13 +43,36 @@ export default function Popup() {
     const prompt = `Context:\n${extracted}\n\nUser:\n${input}`;
 
     try {
-      const result = await getAIReply(prompt);
+      if (!apiKey) throw new Error("Missing API key");
+      const result = await getAIReply(prompt, apiKey);
       setReply(result || "No reply received.");
     } catch (error) {
       console.error("AI API Error:", error);
-      showToast("❌ Failed to fetch AI reply.");
+      if (error.message && error.message.includes("missing")) {
+        showToast("⚠️ API key missing — open Settings to add your OpenRouter key.");
+      } else {
+        showToast("❌ Failed to fetch AI reply.");
+      }
       setReply("Failed to fetch reply.");
     }
+  };
+
+  const saveApiKey = () => {
+    const trimmed = apiKey.trim();
+    if (!trimmed) {
+      showToast("⚠️ API key cannot be empty.");
+      return;
+    }
+    chrome.storage.local.set({ openrouterApiKey: trimmed }, () => {
+      showToast("✅ API key saved.");
+    });
+  };
+
+  const clearApiKey = () => {
+    chrome.storage.local.remove(["openrouterApiKey"], () => {
+      setApiKey("");
+      showToast("✅ API key cleared.");
+    });
   };
 
   const generateReply = async () => {
@@ -87,9 +116,38 @@ export default function Popup() {
   return (
     <div className="container">
       <h1 className="header-with-image">
-        <img src="/icon.png" alt="Icon" className="header-icon" />
+        <img src="/logo.png" alt="retort.ai logo" className="header-icon" />
         retort.ai
       </h1>
+
+      {/* Settings toggle */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+        <button
+          onClick={() => setShowSettings(!showSettings)}
+          style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#666' }}
+          aria-label="Toggle settings"
+        >
+          ⚙️
+        </button>
+      </div>
+
+      {showSettings && (
+        <div className="box" style={{ marginBottom: 12 }}>
+          <div style={{ marginBottom: 8, fontWeight: 600 }}>Settings</div>
+          <label style={{ fontSize: 12, color: '#444' }}>OpenRouter API Key</label>
+          <input
+            type="text"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            placeholder="sk-or-... or Bearer sk-..."
+            style={{ width: '100%', marginTop: 6, padding: '6px', boxSizing: 'border-box' }}
+          />
+          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+            <button onClick={saveApiKey} style={{ flex: 1 }}>Save API Key</button>
+            <button onClick={clearApiKey} style={{ flex: 1, background: '#777' }}>Clear</button>
+          </div>
+        </div>
+      )}
 
       {/* Mode Toggle */}
       <div className="toggle-section">

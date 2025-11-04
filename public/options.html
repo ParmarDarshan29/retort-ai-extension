@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>retort.ai — Options</title>
+    <style>
+      body { font-family: Helvetica, Arial, sans-serif; padding: 1rem; width: 480px; }
+      label { display:block; margin-top: .5rem; font-size: 0.9rem }
+      input[type=text], input[type=password] { width:100%; padding:8px; box-sizing:border-box; }
+      button { margin-top: 0.75rem; padding:8px 12px; }
+      .row { display:flex; gap:8px }
+    </style>
+  </head>
+  <body>
+    <h1>retort.ai — Options</h1>
+
+    <label>OpenRouter API Key (plain)
+      <input id="plainKey" type="text" placeholder="sk-or-..." />
+    </label>
+
+    <hr />
+
+    <div>
+      <label>Encrypt API key with passphrase</label>
+      <input id="encKey" type="text" placeholder="Paste API key to encrypt" />
+      <label style="margin-top:6px">Passphrase</label>
+      <input id="passphrase" type="password" placeholder="Choose a passphrase" />
+      <div class="row">
+        <button id="savePlain">Save Plain Key</button>
+        <button id="encryptSave">Encrypt & Save</button>
+        <button id="clearAll" style="background:#d33;color:#fff">Clear Stored Keys</button>
+      </div>
+    </div>
+
+    <div id="status" style="margin-top:12px;color:#444"></div>
+
+    <script>
+      // Helpers: base64 <-> Uint8Array
+      const toBase64 = (arr) => btoa(String.fromCharCode(...new Uint8Array(arr)));
+      const fromBase64 = (str) => Uint8Array.from(atob(str), c=>c.charCodeAt(0));
+
+      async function deriveKey(passphrase, salt) {
+        const enc = new TextEncoder();
+        const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(passphrase), 'PBKDF2', false, ['deriveKey']);
+        return crypto.subtle.deriveKey(
+          { name: 'PBKDF2', salt, iterations: 150000, hash: 'SHA-256' },
+          keyMaterial,
+          { name: 'AES-GCM', length: 256 },
+          false,
+          ['encrypt', 'decrypt']
+        );
+      }
+
+      async function encrypt(plaintext, passphrase) {
+        const enc = new TextEncoder();
+        const salt = crypto.getRandomValues(new Uint8Array(16));
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const key = await deriveKey(passphrase, salt);
+        const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(plaintext));
+        return { salt: toBase64(salt), iv: toBase64(iv), data: toBase64(ct) };
+      }
+
+      document.getElementById('savePlain').addEventListener('click', () => {
+        const v = document.getElementById('plainKey').value.trim();
+        if (!v) { status('Enter a key to save.'); return; }
+        chrome.storage.local.set({ openrouterApiKey: v, openrouterEncryptedApiKey: null }, ()=> status('Saved plain API key.'));
+      });
+
+      document.getElementById('encryptSave').addEventListener('click', async () => {
+        const key = document.getElementById('encKey').value.trim();
+        const pass = document.getElementById('passphrase').value;
+        if (!key || !pass) { status('Provide both key and passphrase.'); return; }
+        status('Encrypting...');
+        try {
+          const payload = await encrypt(key, pass);
+          chrome.storage.local.set({ openrouterEncryptedApiKey: payload, openrouterApiKey: null }, ()=> status('Encrypted key saved.'));
+        } catch (e) { status('Encryption failed: '+e.message); }
+      });
+
+      document.getElementById('clearAll').addEventListener('click', ()=>{
+        chrome.storage.local.remove(['openrouterApiKey','openrouterEncryptedApiKey'], ()=> status('Cleared stored keys.'));
+      });
+
+      function status(msg){ document.getElementById('status').textContent = msg; }
+
+      // Load existing keys (show brief info)
+      chrome.storage.local.get(['openrouterApiKey','openrouterEncryptedApiKey'], (res)=>{
+        if (res.openrouterApiKey) document.getElementById('plainKey').value = res.openrouterApiKey;
+        if (res.openrouterEncryptedApiKey) document.getElementById('status').textContent = 'An encrypted API key is stored.';
+      });
+    </script>
+  </body>
+</html>

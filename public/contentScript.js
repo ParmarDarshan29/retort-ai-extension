@@ -1,8 +1,11 @@
+// Copied from src/content/ContentScript.js and normalized to lowercase name
+// so it matches `manifest.json` and will be copied to `dist/` by Vite.
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "extractText") {
     const source = request.source || "selection";
 
-    // Extract highlighted text (user selection)
+    // ✅ Extract highlighted text (user selection)
     if (source === "selection") {
       try {
         const selection = window.getSelection();
@@ -19,13 +22,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
     }
 
-    // Extract full visible page text
+    // ✅ Extract full visible page text
     else if (source === "fullpage") {
       const isVisible = (element) => {
         const style = window.getComputedStyle(element);
+        // Fixed visibility check: treat an element as visible unless it's hidden or fully transparent
         return (
           style.display !== "none" &&
-          style.visibility === "visible" &&
+          style.visibility !== "hidden" &&
           style.opacity !== "0" &&
           element.offsetParent !== null
         );
@@ -42,7 +46,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
       });
 
-      // Limit total text size to avoid overloading API
+      // ✅ Limit total text size to avoid overloading API
       const MAX_LENGTH = 2000;
       if (visibleText.length > MAX_LENGTH) {
         visibleText = visibleText.substring(0, MAX_LENGTH) + "\n\n[Content Truncated]";
