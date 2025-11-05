@@ -1,8 +1,7 @@
-<p align="center">
-	<img src="public/logo.png" alt="retortai logo" width="72" />
+<p style="display:flex;align-items:center;gap:12px;">
+	<img src="public/logo.png" alt="retortai logo" style="width:72px;height:72px;object-fit:contain;" />
+	<span style="font-size:28px;font-weight:700;">retortai — Browser Extension</span>
 </p>
-
-# retortai — Browser Extension
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
