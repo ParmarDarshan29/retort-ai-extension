@@ -15,7 +15,7 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 // ✅ Handle Context Menu Click
-chrome.contextMenus.onClicked.addListener((info, tab) => {
+chrome.contextMenus.onClicked.addListener((info, _tab) => {
   if (info.menuItemId === "retort-ai-selection" && info.selectionText) {
     console.log("✅ Text selected from context menu:", info.selectionText);
 
