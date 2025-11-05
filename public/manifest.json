@@ -15,11 +15,11 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_popup": "public/popup.html",
+    "default_popup": "popup.html",
     "default_icon": "icon.png"
   },
   "options_ui": {
-    "page": "public/options.html",
+    "page": "options.html",
     "open_in_tab": true
   },
   "content_scripts": [
