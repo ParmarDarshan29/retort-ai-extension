@@ -1,5 +1,3 @@
-# ![retort](./retort.gif)
-
 # retort.ai — Browser Extension
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
