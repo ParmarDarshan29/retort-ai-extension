@@ -132,7 +132,7 @@ Important: do not commit real API keys to version control. If you share the repo
 
 ## Team
 
--Darshan Parmar       -Twisha Patel
+- -Darshan Parmar       -Twisha Patel
 -Akshat Chhatriwala   -Ishita Akolkar
 
 ## License
