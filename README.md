@@ -109,12 +109,35 @@ After a successful build, the `dist/` folder is ready to be loaded as an unpacke
 3. Click **Load unpacked** and select the `dist/` folder from this repository (e.g. `D:\retort-ai-extension\dist`).
 4. The extension should appear in your toolbar. Click the icon to open the popup.
 
+## Install from Releases (download extension.zip)
+
+If we publish release artifacts on GitHub, you can download `extension.zip` from the Releases page and install it locally without using the Chrome Web Store:
+
+1. Open this repository's Releases page: https://github.com/twi-exe/retort-ai-extension/releases
+2. Download the `extension.zip` asset from the desired release.
+3. Unzip the downloaded `extension.zip` to a folder.
+4. In Chrome: open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select the unzipped folder.
+
+This is a convenient way to distribute builds to testers without publishing to the Chrome Web Store.
+
 
 ## API key / Security
 
 This extension provides an in-popup Settings UI where you can enter your OpenRouter API key. The key is saved to `chrome.storage.local` and used at runtime; it is no longer stored in source code.
 
 Important: do not commit real API keys to version control. If you share the repository or publish it, rotate any keys you used for testing.
+
+### How to add your OpenRouter API key
+
+1. Install or load the extension (see "Load into Chrome/Edge (unpacked)" above or install from Releases).
+2. Click the extension icon in the toolbar to open the popup.
+3. Click the gear (⚙️) button in the top-right of the popup to open Settings.
+4. Paste your OpenRouter API key into the **OpenRouter API Key** field and click **Save**.
+5. The extension stores the key in `chrome.storage.local` and will use it for API calls.
+
+Notes:
+- If you don't have an OpenRouter API key, sign up at https://openrouter.ai (or your chosen LLM provider) and create an API key.
+- The popup will show a toast notification when the key is saved successfully.
 
 
 ## Troubleshooting

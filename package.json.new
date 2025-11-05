@@ -1,8 +1,27 @@
 {
   "name": "retort-ai-extension",
   "private": true,
-  "version": "0.1.3",
-  "description": "retort.ai — AI-powered smart reply generator Chrome extension (source)",
+  "version": "0.1.0",
+  
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/twi-exe/retort-ai-extension.git"
+  },
+  "bugs": {
+    "url": "https://github.com/twi-exe/retort-ai-extension/issues"
+  },
+  "homepage": "https://github.com/twi-exe/retort-ai-extension#readme",
+  "keywords": [
+    "chrome-extension",
+    "retort",
+    "ai",
+    "react",
+    "vite"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "type": "module",
   "license": "MIT",
   "scripts": {

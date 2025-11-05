@@ -15,7 +15,8 @@ export default defineConfig([
     ],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      // include browser globals and the Chrome extension `chrome` global
+      globals: { ...globals.browser, chrome: 'readonly' },
       parserOptions: {
         ecmaVersion: 'latest',
         ecmaFeatures: { jsx: true },
@@ -23,7 +24,9 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // ignore unused vars that start with an uppercase letter or underscore
+      // and ignore unused function args that start with an underscore
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]', argsIgnorePattern: '^_' }],
     },
   },
 ])

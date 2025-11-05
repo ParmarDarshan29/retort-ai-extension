@@ -1,0 +1,48 @@
+name: Create Release Artifact
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag name to create release for (e.g. v0.1.3). If empty, a tag release-<sha> will be used.'
+        required: false
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and package extension
+        run: npm run package
+
+      - name: Compute release tag
+        id: compute_tag
+        run: |
+          # prefer explicit input tag when provided via workflow_dispatch
+          if [ -n "${{ github.event.inputs.tag || '' }}" ]; then
+            echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=release-${GITHUB_SHA}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create or update GitHub Release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          # prefer an explicit tag input for manual runs, otherwise use a deterministic tag
+          tag: ${{ steps.compute_tag.outputs.tag }}
+          name: ${{ steps.compute_tag.outputs.tag }}
+          body: "Automated build: ${{ github.sha }}"
+          artifacts: extension.zip
