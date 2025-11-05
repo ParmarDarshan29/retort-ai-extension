@@ -4,14 +4,6 @@ A lightweight Chrome/Edge extension that helps generate context-aware replies us
 
 This repo contains a small React popup, a background script that provides a context menu entry, and a content script to extract text from web pages.
 
-## Team
-
-- Darshan
-- Twisha
-- Akshat
-- Ishita
-
-
 ## Features
 
 - Generate a reply from selected text or full page content
@@ -91,6 +83,10 @@ Important: do not commit real API keys to version control. If you share the repo
 - Use the browser extension inspector (chrome://extensions → Inspect views) to open popup devtools and debug runtime issues.
 - Run `npm run lint` to check for JavaScript/React issues according to the repo ESLint configuration.
 
+## Team
+
+- Darshan - Akshat 
+- Twisha  - Ishita
 
 ## License
 

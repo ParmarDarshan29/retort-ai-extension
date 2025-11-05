@@ -210,17 +210,18 @@ export default function Popup() {
       {/* AI Reply */}
       <div className="box reply-box">{reply || "AI reply will appear here..."}</div>
 
-      {/* Copy Button */}
-      {reply && reply !== "AI reply will appear here..." && (
-        <button onClick={copyReplyToClipboard} className="copy-button">
-          📋 Copy Reply
-        </button>
-      )}
+      {/* Actions: copy + generate */}
+      <div className="actions">
+        {reply && reply !== "AI reply will appear here..." && (
+          <button onClick={copyReplyToClipboard} className="copy-button">
+            📋 Copy
+          </button>
+        )}
 
-      {/* Generate Button */}
-      <button onClick={generateReply} disabled={loading}>
-        {loading ? "Thinking..." : "Generate Reply"}
-      </button>
+        <button onClick={generateReply} disabled={loading} className="generate-button">
+          {loading ? "Thinking..." : "Generate Reply"}
+        </button>
+      </div>
 
       {/* Toast */}
       {toast && <div className="toast">{toast}</div>}
